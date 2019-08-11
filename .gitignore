@@ -4,3 +4,7 @@ lib/
 include/
 *.pyc
 *.log
+src/*.pyc
+src/bin
+src/include
+src/__pycache_
