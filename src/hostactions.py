@@ -1,34 +1,32 @@
-from pinger import Pinger
-import sys
+from hostactions import Pinger
+from hostactions.Observable import Observable
+from hostactions.plugins.PingObserver import PingObserver
 import json
-import threading
 import logging
-import datetime
-import concurrent.futures
+logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO)
+logging.captureWarnings(True)
+logger = logging.getLogger(__name__)
 
-def worker_ping_host(ip):
-	logging.info("Starting worker thread to ping {}".format(ip))
-	pinger = Pinger(ip=ip)
-	with open('activity.log', 'w+') as file:
-		while 1 ==1:
-			host_status = pinger.isHostAlive()
-			status = '"{}", "{}"\n'.format(datetime.datetime.now().timestamp(), host_status)
-			logging.info(status)
-			file.write(status)
-			file.flush()
+def get_settings(filename='settings.json'):
+	settingsJson = None
+	with open(filename, 'r') as file:
+		settingsJson = json.load(file)
+	return settingsJson
 
 
 if __name__ == '__main__':
 	logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO)
 
-	ip_list = [
-		'172.16.10.106'
-	]
+	# load host and ping settings
+	settings = get_settings()
+	logging.info('Settings: {}'.format(settings))
+	if settings == None: raise Exception('No settings loaded.')
 
-	for ip in ip_list:
-		worker_ping_host(ip)
-
-
-
-
-
+	# spawn worker threads to begin polling hosts
+	# and emit events on each response]
+	# @todo -- move this into its own python thread
+	for host in settings['hosts']:
+		logger.info(host)
+		pub = Observable(host)
+		pub.observe_host()
+		pingObserver = PingObserver('pinghandler', pub)

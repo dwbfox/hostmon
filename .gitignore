@@ -7,4 +7,5 @@ include/
 src/*.pyc
 src/bin
 src/include
-src/__pycache_
+src/settings.json
+src/__pycache_git
