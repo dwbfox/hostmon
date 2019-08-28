@@ -2,9 +2,6 @@ from . import Pinger
 import logging
 import datetime
 
-logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO)
-logging.captureWarnings(True)
-logger = logging.getLogger(__name__)
 
 class Event:
     def __init__(self, name, assertion, timestamp, meta):
@@ -20,11 +17,15 @@ class Observable:
     def __init__(self, host):
         self.observers = []
         self.timeoutcount = 0
-        self.deadtimer = 60
+        self.deadtimer = host['deadTimer']
         self.host = host
-        logger.info('Settings: {}'.format(self.host.keys()))
+        logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.DEBUG)
+        logging.captureWarnings(True)
+        self.logger = logging.getLogger(__name__)
+        self.logger.info('Settings: {}'.format(self.host.keys()))
 
     def register(self, observer, callback = None):
+        self.logger.info('Registering class {} to observer'.format(observer.__class__.__name__))
         self.observers.append(observer)
 
     def unregister(self, observer):
@@ -35,7 +36,7 @@ class Observable:
             observer.update(event)
 
     def observe_host(self):
-        pinger = Pinger.Pinger(ip=self.host['monitorIp'], frequency=str(self.host['frequency']))
+        pinger = Pinger.Pinger(ip=self.host['monitorIP'], frequency=str(self.host['frequency']))
 
         ''' REMOVE BEFORE FLIGHT
         e = Event('deadEvent', True, '0000', '00:0:00')
@@ -46,10 +47,9 @@ class Observable:
         while True:
             host_alive = pinger.isHostAlive()
             if host_alive: self.timeoutcount = 0
-            logger.info('Timeout count: {} | Dead Timer: {}'.format(self.timeoutcount, self.deadtimer))
             timestamp = datetime.datetime.now().timestamp()
             if self.timeoutcount >= self.deadtimer:
-                e = Event('deadEvent', True, timestamp, mac)
+                e = Event('deadEvent', True, timestamp, None)
                 self.dispatch(e)
                 continue
             if not host_alive:
