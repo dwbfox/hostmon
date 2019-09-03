@@ -27,7 +27,6 @@ def initObservers(hostData):
 if __name__ == '__main__':
 	# load host and ping settings
 	settings = get_settings()
-	#logging.info('Settings: {}'.format(settings))
 	if settings == None: raise Exception('No settings loaded.')
 
 	# spawn worker threads to begin polling hosts
