@@ -1,0 +1,9 @@
+[Unit]
+Description=
+After=network.target
+
+[Service]
+ExecStart=/home/jupiter/coding/host_alive_actions/src/hostactions.py
+
+[Install]
+WantedBy=default.target

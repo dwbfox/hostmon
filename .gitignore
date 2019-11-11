@@ -9,3 +9,4 @@ src/bin
 src/include
 src/settings.json
 src/__pycache_git
+lib64

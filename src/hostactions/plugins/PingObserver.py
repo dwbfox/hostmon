@@ -32,8 +32,10 @@ class PingObserver:
     def _is_dry_run(self):
         return self.host['dryrun']
 
+
     def _is_host_off(self):
         return ('POWER_OFF' == self._dracclient.get_power_state())
+
 
     def _turn_host_off_bmc(self):
         if self._is_dry_run():
@@ -49,7 +51,7 @@ class PingObserver:
             return
         response = subprocess.Popen(['/usr/bin/ssh', '-i', '/home/jupiter/.ssh/europa_lab', 'root@{}'.format(self.host['monitorIP']), 'shutdown -h now'],  stdout=subprocess.DEVNULL).wait()
         time.sleep(10)
-        if not self._is_host_off():
+        if not self._is_host_off() and not self.host['forceAction'] == false:
             logger.warn('Graceful shutdown seems to have failed, falling back to BMC shutdown...')
             self._turn_host_off_bmc()
 
@@ -58,9 +60,11 @@ class PingObserver:
         self.alreadyAlive = True
         self.alreadyDead = False
 
+
     def _mark_subject_dead(self):
         self.alreadyAlive = False
         self.alreadyDead = True
+
 
     def update(self, event):
         logger.info('{} {}'.format(self.host['bmc']['ip'], str(event)) )
@@ -94,5 +98,5 @@ class PingObserver:
             self._turn_host_off()
             logger.info('Turned host on/off, cooling down for {} seconds'.format(self.poweronoff_cooldown_time))
             time.sleep(self.poweronoff_cooldown_time)
-            
+
 
