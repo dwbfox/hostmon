@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	# spawn worker threads to begin polling hosts
 	# and emit events on each response]
 	# @todo -- move this into its own python thread
-	with concurrent.futures.ThreadPoolExecutor(max_workers=settings['global']['max_workers']) as executor:
+	with concurrent.futures.ThreadPoolExecutor(max_workers=settings['global']['max_workers'] as executor:
 		result = executor.map(initObservers, settings['hosts'])
 		for r in result:
 			print(type(r))
